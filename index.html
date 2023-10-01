@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body>
+    <div id="_whole">
+      <header>
+        <nav>
+          <div class="_header">
+            <h3 id="_city">City</h3>
+            <div class="_form">
+              <input type="text" placeholder="Search" id="_search" />
+              <button type="submit" onclick="_get_params()" id="_submit">
+                Search
+              </button>
+            </div>
+          </div>
+        </nav>
+      </header>
+
+      <div class="_temp-display">
+        <div class="_temp-display-inner">
+          <h1 id="_temp">25&degC</h1>
+          <div class="_range">
+            <div class="_span">
+              <h6 id="_temp-span">Cloudy</h6>
+              <i id="_sky_icon" class="bi bi-clouds"></i>
+            </div>
+            <div class="_innerdiv">
+              <p id="_temp-min">21~</p>
+              <p id="_temp-max">25</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="_mid">
+        <div class="_tem-feel">
+          <i id="_icon-thermo" class="bi bi-thermometer"></i>
+          <p id="_feel">25</p>
+          <p>Feels Like</p>
+        </div>
+
+        <div class="_force">
+          <i class="bi bi-wind"></i>
+          <p id="_force">5</p>
+          <p>Force</p>
+        </div>
+
+        <div class="_humidity">
+          <i class="bi bi-moisture"></i>
+          <p id="_humidity">90</p>
+          <p>Humidity</p>
+        </div>
+
+        <div class="_uv">
+          <i class="bi bi-snow3"></i>
+          <p id="_uv">4</p>
+          <p>UV</p>
+        </div>
+
+        <div class="_visibility">
+          <i id="_icon-vis" class="bi bi-eye-fill"></i>
+          <p id="_vis">8</p>
+          <p>Visibility</p>
+        </div>
+
+        <div class="_pressure">
+          <i class="bi bi-speedometer"></i>
+          <p id="_pressure">1025</p>
+          <p>Air Pressure</p>
+        </div>
+      </div>
+
+      <div class="_table">
+        <div class="_data">
+          <i class="bi bi-sunrise"></i>
+          <p id="_sunR">07:19 AM</p>
+        </div>
+
+        <div class="_day">
+          <i class="bi bi-sunset-fill"></i>
+          <p id="_sunS">07:04 PM</p>
+        </div>
+
+        <div class="_curr-temp">
+          <i class="bi bi-cloud-moon"></i>
+          <p id="_moonR">08:15 PM</p>
+        </div>
+
+        <div class="_min-max">
+          <i class="bi bi-cloud-moon-fill"></i>
+          <p id="_moonS">09:58 AM</p>
+        </div>
+      </div>
+    </div>
+    <script>
+      // weather api
+      let Element_inserted = false
+      function _get_params() {
+        var loca = document.getElementById("_search").value
+        console.log(loca)
+        // var Search_params = URLSearchParams(window.location.search)
+        // var datareceived = Search_params.get("data")
+
+        // var datareceived = localStorage.getItem("data")
+        // console.log(datareceived)
+
+        document.getElementById("_city").innerHTML = loca
+        const url = new URL(
+          "https://world-weather-online-api1.p.rapidapi.com/weather.ashx?q=dehli&format=json"
+        )
+        url.searchParams.set("q", loca)
+        const options = {
+          method: "GET",
+          headers: {
+            "X-RapidAPI-Key":
+              "8495762a16msh10cee5ce945460bp113a84jsn3e316e6f20f4",
+            "X-RapidAPI-Host": "world-weather-online-api1.p.rapidapi.com",
+          },
+        }
+
+        fetch(url, options)
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error("error in fetching ")
+            }
+            return res.json()
+          })
+
+          .then((Data) => {
+            document.getElementById("_feel").innerHTML =
+              Data.data.current_condition[0].FeelsLikeC
+            document.getElementById("_force").innerHTML =Data.data.current_condition[0].windspeedKmph +" "+ Data.data.current_condition[0].winddir16Point
+            document.getElementById("_humidity").innerHTML =
+              Data.data.current_condition[0].humidity + "%"
+            document.getElementById("_temp").innerHTML =
+              Data.data.current_condition[0].temp_C + "&deg;C"
+            document.getElementById("_pressure").innerHTML =
+              Data.data.current_condition[0].pressure
+            document.getElementById("_vis").innerHTML =
+              Data.data.current_condition[0].visibility
+            document.getElementById("_uv").innerHTML =
+              Data.data.current_condition[0].uvIndex
+
+            document.getElementById("_feel").style.fontWeight = "bold"
+            document.getElementById("_force").style.fontWeight = "bold"
+            document.getElementById("_humidity").style.fontWeight = "bold"
+            document.getElementById("_pressure").style.fontWeight = "bold"
+            document.getElementById("_vis").style.fontWeight = "bold"
+            document.getElementById("_uv").style.fontWeight = "bold"
+
+            document.getElementById("_temp-min").innerHTML =
+              Data.data.weather[0].mintempC + "~"
+            document.getElementById("_temp-max").innerHTML =
+              Data.data.weather[0].maxtempC + "&deg;C"
+            var _weather = Data.data.current_condition[0].weatherDesc[0].value
+            document.getElementById("_temp-span").innerHTML = _weather
+
+            document.getElementById("_sunR").innerHTML =
+              Data.data.weather[0].astronomy[0].sunrise
+            document.getElementById("_sunS").innerHTML =
+              Data.data.weather[0].astronomy[0].sunset
+            document.getElementById("_moonR").innerHTML =
+              Data.data.weather[0].astronomy[0].moonrise
+            document.getElementById("_moonS").innerHTML =
+              Data.data.weather[0].astronomy[0].moonset
+
+            let xx = _weather.toLowerCase()
+            console.log(xx)
+            if (xx == "cloudy" || xx == "partly cloudy") {
+              document.getElementById("_sky_icon").className = "bi bi-clouds"
+            } else if (xx == "clear") {
+              document.getElementById("_sky_icon").className = "bi bi-cloud"
+            } else if (xx == "sunny" || xx == "overcast") {
+              document.getElementById("_sky_icon").className = "bi bi-sun"
+            } else if (
+              xx == "patchy rain possible" ||
+              xx == "light rain shower"
+            ) {
+              document.getElementById("_sky_icon").className =
+                "bi bi-cloud-rain"
+            } else if (xx == "fog" || xx == "mist") {
+              document.getElementById("_sky_icon").className =
+                "bi bi-cloud-snow"
+            } else if (xx == "partly light drizzle") {
+              document.getElementById("_sky_icon").className =
+                "bi bi-cloud-lightning"
+            } else {
+              document.getElementById("_sky_icon").className = "bi bi-clouds"
+            }
+
+            // const x = Data.data.current_condition[0].weatherIconUrl[0]
+            // const img = new Image()
+            // img.onload = function () {
+            //   document.getElementById("_sky_icon").innerHTML = img
+            // }
+            // img.src = x
+
+            //icon change
+            var _temperature = Data.data.current_condition[0].temp_C
+            if (_temperature <= 14) {
+              document.getElementById("_icon-thermo").className =
+                "bi bi-thermometer-low"
+            } else if (_temperature <= 32 && _temperature > 14) {
+              document.getElementById("_icon-thermo").className =
+                "bi bi-thermometer-half"
+            } else if (_temperature > 32) {
+              document.getElementById("_icon-thermo").className =
+                "bi bi-thermometer-high"
+            } else {
+              document.getElementById("_icon-thermo").className =
+                "bi bi-thermometer"
+            }
+
+            var _visibility_ = Data.data.current_condition[0].visibility
+            if (_visibility_ <= 5) {
+              document.getElementById("_icon-vis").className =
+                "bi bi-eye-slash-fill"
+            } else if (_visibility_ > 5) {
+              document.getElementById("_icon-vis").className = "bi bi-eye-fill"
+            }
+
+            console.log(Data)
+            if (!Element_inserted) {
+              var forcast = document.createElement("div")
+              var _heading1 = document.createElement("h6")
+              forcast.appendChild(_heading1)
+              _heading1.innerHTML = "Weather Forecast"
+              forcast.style.textAlign = "center"
+              forcast.style.fontSize = "25px"
+              forcast.style.backgroundColor = " rgb(187, 235, 241)"
+              _heading1.style.marginLeft = "37%"
+              _heading1.style.marginRight = "37%"
+              _heading1.style.padding = "6px"
+              _heading1.style.borderRadius = "0 10px 10px 10px"
+              _heading1.style.backgroundColor = "rgb(187, 235, 241)"
+              _heading1.addEventListener(
+                "mouseenter",
+                (event) => {
+                  event.target.style.borderRight = "rgb(173, 217, 224) groove"
+                  event.target.style.borderBottom = "rgb(173, 217, 224) groove"
+                },
+                false
+              )
+              _heading1.addEventListener(
+                "mouseleave",
+                (event) => {
+                  event.target.style.border = ""
+                },
+                false
+              )
+              document.getElementById("_whole").appendChild(forcast)
+
+              for (let i = 0; i < 3; i++) {
+                var xxx =
+                  Data.data.weather[
+                    i
+                  ].hourly[3].weatherDesc[0].value.toLowerCase()
+                var _weather = Data.data.weather[i].hourly[3].cloudcover
+                var p1 = document.createElement("p")
+                p1.id = "p0" + i
+                p1.innerHTML = Data.data.weather[i].date
+                var p2 = document.createElement("p")
+                p2.id = "p1" + i
+                p2.innerHTML = xxx
+                var p3 = document.createElement("p")
+                var i1 = document.createElement("i")
+                i1.id = "i1" + i
+
+                if (xxx == "cloudy" || xxx == "partly cloudy") {
+                  i1.className = "bi bi-clouds"
+                } else if (xxx == "clear") {
+                  i1.className = "bi bi-cloud"
+                } else if (xxx == "sunny" || xxx == "overcast") {
+                  i1.className = "bi bi-sun"
+                } else if (
+                  xxx == "patchy rain possible" ||
+                  xxx == "light rain shower"
+                ) {
+                  i1.className = "bi bi-cloud-rain"
+                } else if (xxx == "fog" || xxx == "mist") {
+                  i1.className = "bi bi-cloud-snow"
+                } else if (xxx == "partly light drizzle") {
+                  i1.className = "bi bi-cloud-lightning"
+                } else {
+                  i1.className = "bi bi-clouds"
+                }
+
+                p3.id = "p2" + i
+                p3.innerHTML = _weather + "%"
+                var p4 = document.createElement("p")
+                p4.id = "p3" + i
+                p4.innerHTML = Data.data.weather[i].mintempC
+                var p5 = document.createElement("p")
+                p5.id = "p4" + i
+                p5.innerHTML = Data.data.weather[i].maxtempC
+
+                p1.style.backgroundColor = "rgb(187, 235, 241)"
+                p2.style.backgroundColor = "rgb(187, 235, 241)"
+                i1.style.fontSize = "24px"
+                i1.style.backgroundColor = "rgb(187, 235, 241)"
+                i1.style.padding = "10px"
+                p3.style.backgroundColor = "rgb(187, 235, 241)"
+                p4.style.backgroundColor = "rgb(187, 235, 241)"
+                p5.style.backgroundColor = "rgb(187, 235, 241)"
+                var div = document.createElement("div")
+                var div1 = document.createElement("div")
+                div1.style.backgroundColor = "rgb(187, 235, 241)"
+                div1.appendChild(p1)
+                div.appendChild(div1)
+                var div2 = document.createElement("div")
+                div2.style.backgroundColor = "rgb(187, 235, 241)"
+                div2.appendChild(p2)
+                div.appendChild(div2)
+                var div3 = document.createElement("div")
+                div3.style.backgroundColor = "rgb(187, 235, 241)"
+                div3.style.display = "flex"
+                div3.style.justifyContent = "center"
+                div3.style.alignItems = "center"
+                div3.appendChild(p3)
+                div3.appendChild(i1)
+                div.appendChild(div3)
+                var div4 = document.createElement("div")
+                div4.style.backgroundColor = "rgb(187, 235, 241)"
+                div4.appendChild(p4)
+                div.appendChild(div4)
+                var div5 = document.createElement("div")
+                div5.style.backgroundColor = "rgb(187, 235, 241)"
+                div5.appendChild(p5)
+                div.appendChild(div5)
+                div.style.marginTop = "1%"
+                div.style.display = "grid"
+                div.style.gridTemplateColumns = "auto auto auto auto auto"
+                div.style.justifyContent = "center"
+
+                div.style.backgroundColor = "rgb(187, 235, 241)"
+                div.style.borderRadius = "15px"
+                div.style.padding = "10px"
+                div.style.textAlign = "center"
+
+                div.addEventListener(
+                  "mouseenter",
+                  (event) => {
+                    event.target.style.borderRight = "rgb(173, 217, 224) groove"
+                    event.target.style.borderBottom =
+                      "rgb(173, 217, 224) groove"
+                  },
+                  false
+                )
+                div.addEventListener(
+                  "mouseleave",
+                  (event) => {
+                    event.target.style.border = ""
+                  },
+                  false
+                )
+
+                var x = window.matchMedia("(max-width: 552px)")
+                if (x.matches) {
+                  div.style.padding = "2px"
+                  div.style.gap = "10px"
+                  div.style.marginLeft = "18%"
+                  div.style.marginRight = "18%"
+                } else {
+                  div.style.padding = "10px"
+                  div.style.gap = "40px"
+                  div.style.marginLeft = "27%"
+                  div.style.marginRight = "27%"
+                }
+                document.getElementById("_whole").appendChild(div)
+              }
+
+              Element_inserted = true
+            } else {
+              for (let i = 0; i < 3; i++) {
+                var xxx =
+                  Data.data.weather[
+                    i
+                  ].hourly[3].weatherDesc[0].value.toLowerCase()
+                var _weather = Data.data.weather[i].hourly[3].cloudcover
+                var p1 = document.getElementById("p0" + i)
+                p1.textContent = Data.data.weather[i].date
+                var p2 = document.getElementById("p1" + i)
+                p2.textContent = xxx
+                var i1 = document.getElementById("i1" + i)
+                if (xxx == "cloudy" || xxx == "partly cloudy") {
+                  i1.className = "bi bi-clouds"
+                } else if (xxx == "clear") {
+                  i1.className = "bi bi-cloud"
+                } else if (xxx == "sunny" || xxx == "overcast") {
+                  i1.className = "bi bi-sun"
+                } else if (
+                  xxx == "patchy rain possible" ||
+                  xxx == "light rain shower"
+                ) {
+                  i1.className = "bi bi-cloud-rain"
+                } else if (xxx == "fog" || xxx == "mist") {
+                  i1.className = "bi bi-cloud-snow"
+                } else if (xxx == "partly light drizzle") {
+                  i1.className = "bi bi-cloud-lightning"
+                } else {
+                  i1.className = "bi bi-clouds"
+                }
+                var p3 = document.getElementById("p2" + i)
+                p3.textContent = _weather + "%"
+                var p4 = document.getElementById("p3" + i)
+                p4.textContent = Data.data.weather[i].mintempC
+                var p5 = document.getElementById("p4" + i)
+                p5.textContent = Data.data.weather[i].maxtempC
+              }
+            }
+          })
+          .catch((err) => console.error(err))
+      }
+    </script>
+  </body>
+</html>
